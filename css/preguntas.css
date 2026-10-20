@@ -3,6 +3,52 @@
    Depende de: css/index.css (variables y reset base)
 ============================================================ */
 
+/* ── Fondo de video (playa aérea) ─────────────────────── */
+.faq-fondo {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  background: #0b2a3a url("../recursos/playa_poster.jpg") center / cover no-repeat;
+}
+
+.faq-fondo-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* velo oscuro para que el texto se lea sobre el mar */
+.faq-fondo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(6, 18, 32, 0.32) 0%, rgba(6, 18, 32, 0.5) 100%);
+}
+
+.faq-pagina .faq-header h1,
+.faq-pagina .faq-header p,
+.faq-pagina .faq-category,
+.faq-pagina .faq-pregunta,
+.faq-pagina .faq-body-inner p {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.75);
+}
+
+.faq-pagina .faq-header p,
+.faq-pagina .faq-category,
+.faq-pagina .faq-body-inner p {
+  color: #e6edf3;
+}
+
+body.faq-pagina {
+  background: transparent;
+}
+
+.faq-pagina main {
+  position: relative;
+  z-index: 0;
+}
+
 /* ── Wrap con línea dorada superior ───────────────────── */
 .faq-section-wrap {
   position: relative;
