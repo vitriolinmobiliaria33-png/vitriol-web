@@ -103,18 +103,83 @@ body.pagina-playa {
   text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
 }
 
-/* sobre el video, la barra y las tarjetas van en blanco para que se lean */
-.pagina-playa .barra-busqueda,
-.pagina-playa .card-propiedad,
-.pagina-playa .btn-filtros-movil,
+/* sobre el video: barra y tarjetas en negro con detalles dorados (colores de la marca) */
+.pagina-playa .barra-busqueda {
+  background: rgba(10, 10, 10, 0.8);
+  border: 1px solid rgba(201, 168, 76, 0.45);
+  border-top: 2px solid var(--gold);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.pagina-playa .barra-busqueda input,
+.pagina-playa .barra-busqueda select,
+.pagina-playa .filtro-precio-btn,
 .pagina-playa .ordenar-btn {
-  background: rgba(255, 255, 255, 0.94);
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(201, 168, 76, 0.45);
+  color: #f3ead2;
+}
+
+.pagina-playa .barra-busqueda input::placeholder {
+  color: rgba(243, 234, 210, 0.6);
+}
+
+.pagina-playa #filtroBarrio {
+  border: 1px solid rgba(201, 168, 76, 0.45);
+  color: #f3ead2;
+}
+
+.pagina-playa #filtroBarrio::placeholder {
+  color: rgba(243, 234, 210, 0.6);
+}
+
+.pagina-playa .precio-chevron {
+  stroke: #d8b25e;
+}
+
+.pagina-playa .filtro-precio-btn.activo {
+  color: #e0b55a;
+}
+
+.pagina-playa .btn-filtros-movil,
+.pagina-playa .filtros-ordenar-row .ordenar-btn {
+  background: rgba(10, 10, 10, 0.8);
+  border: 1px solid rgba(201, 168, 76, 0.55);
+  color: #f3ead2;
 }
 
 .pagina-playa .card-propiedad {
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.25);
+  background: rgba(10, 10, 10, 0.82);
+  border: 1px solid rgba(201, 168, 76, 0.4);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
 }
 
+.pagina-playa .card-propiedad:hover {
+  border-color: var(--gold);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.45);
+}
+
+.pagina-playa .card-propiedad .precio {
+  color: #e0b55a !important;
+}
+
+.pagina-playa .card-propiedad .detalles {
+  color: #f1ece0 !important;
+}
+
+.pagina-playa .card-propiedad .ubicacion {
+  color: rgba(241, 236, 224, 0.65) !important;
+}
+
+.pagina-playa .pagina-inactiva {
+  background: rgba(10, 10, 10, 0.75);
+  border-color: rgba(201, 168, 76, 0.5);
+  color: #e0b55a;
+}
 .pagina-playa .loading-state,
 .pagina-playa .paginacion-container {
   color: #ffffff;
