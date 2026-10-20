@@ -17,7 +17,18 @@
 
 </a>
 
-<body class="pagina-clara">
+<body class="pagina-clara pagina-playa">
+
+    <!-- Fondo: video aéreo de playa (Pexels, uso libre) -->
+    <div class="fondo-playa" aria-hidden="true">
+        <video class="fondo-playa-video" autoplay muted loop playsinline preload="auto" poster="recursos/playa_poster.jpg"></video>
+    </div>
+    <script>
+        (function () {
+            var v = document.querySelector('.fondo-playa-video');
+            v.src = window.matchMedia('(max-width: 768px)').matches ? 'recursos/playa_mobile.mp4' : 'recursos/playa.mp4';
+        })();
+    </script>
 
     <header class="navbar">
         <a href="./index.html">
