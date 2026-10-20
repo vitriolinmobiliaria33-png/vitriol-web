@@ -235,6 +235,31 @@ footer {
   box-shadow: 0 4px 24px rgba(0,0,0,0.35);
 }
 
+/* Marca al centro de la barra: raya dorada · VITRIOL INMOBILIARIA · raya dorada */
+.navbar::after {
+  content: 'VITRIOL INMOBILIARIA';
+  position: absolute;
+  left: calc(50% - 207px); /* centrado en el espacio libre entre el logo y el menú */
+  top: 50%;
+  transform: translate(-50%, -50%);
+  padding: 0 58px;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.32em;
+  white-space: nowrap;
+  color: rgba(224, 181, 90, 0.85);
+  background:
+    linear-gradient(90deg, transparent, rgba(201, 168, 76, 0.9)) left center / 44px 1px no-repeat,
+    linear-gradient(90deg, rgba(201, 168, 76, 0.9), transparent) right center / 44px 1px no-repeat;
+  pointer-events: none;
+}
+
+/* en pantallas medianas el menú ocupa el centro: ocultar para que no se encime */
+@media (min-width: 901px) and (max-width: 1030px) {
+  .navbar::after { display: none; }
+}
+
 .navbar a {
   display: flex;
   align-items: center;
@@ -1046,6 +1071,7 @@ filter: brightness(1);
 /* ── Responsive ────────────────────────────────────────── */
 @media (max-width: 900px) {
   .navbar { padding: 0 24px; height: 72px; }
+  .navbar::after { left: calc(50% + 14px); font-size: 8.5px; letter-spacing: 0.2em; padding: 0 26px; background-size: 20px 1px, 20px 1px; }
   .navbar img { height: 58px; }
   .navbar-links { display: none; }
   
