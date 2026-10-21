@@ -126,6 +126,30 @@ body.pagina-playa {
   color: rgba(243, 234, 210, 0.6);
 }
 
+/* El panel de precio es blanco: sus campos van con letra oscura y grande (se lee bien a cualquier edad) */
+.pagina-playa .barra-busqueda .precio-dropdown input[type="number"],
+.precio-input-group input,
+.filtros-modal-grupo input[type="number"] {
+  background-color: #ffffff;
+  border: 1px solid #8a8a8a;
+  color: #111111;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.pagina-playa .barra-busqueda .precio-dropdown input[type="number"]::placeholder,
+.precio-input-group input::placeholder,
+.filtros-modal-grupo input[type="number"]::placeholder {
+  color: #555555;
+  opacity: 1;
+}
+
+.precio-dropdown-titulo,
+.precio-input-group label,
+.filtros-modal-label {
+  color: #333333 !important;
+}
+
 .pagina-playa #filtroBarrio {
   border: 1px solid rgba(201, 168, 76, 0.45);
   color: #f3ead2;
