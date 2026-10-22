@@ -78,7 +78,7 @@ function renderPropiedades(){
 <div class="card-info">
 
 <h3>
-  ${propiedad.Moneda?.trim().toUpperCase() === 'USD' ? 'USD' : '$'} 
+  ${propiedad.Moneda?.trim().toUpperCase() === 'USD' ? 'USD' : propiedad.Moneda?.trim().toUpperCase() === 'EUR' ? '€' : '$'}
   ${propiedad.price.toLocaleString('es-AR')}
 </h3>
 

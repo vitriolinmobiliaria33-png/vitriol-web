@@ -140,7 +140,7 @@ if (propiedad.Imagenes && propiedad.Imagenes.length > 0) {
             <img src="${imagenUrl}" alt="Imagen de propiedad">
             <div class="card-info">
                 <h3 class="precio">
-                ${propiedad.Moneda === 'USD' ? 'USD' : '$'} 
+                ${propiedad.Moneda === 'USD' ? 'USD' : propiedad.Moneda === 'EUR' ? '€' : '$'}
                 ${propiedad.price ? propiedad.price.toLocaleString('es-AR') : 'Consultar'}
                 </h3>
                 <p class="detalles">${nombreTipo} • ${nombreOperacion} • ${cantDormitorios} Dorm.</p>

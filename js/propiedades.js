@@ -61,7 +61,7 @@ function renderizarPropiedad(p) {
 
   // Precio
 document.getElementById('detallePrecio').textContent =
-  `${p.Moneda === 'USD' ? 'USD' : '$'} ${Number(p.price).toLocaleString('es-AR')}`
+  `${p.Moneda === 'USD' ? 'USD' : p.Moneda === 'EUR' ? '€' : '$'} ${Number(p.price).toLocaleString('es-AR')}`
   // Características (ocultar si no tiene valor)
   if (p.bedrooms) {
     document.getElementById('cantDormitorios').textContent = p.bedrooms
