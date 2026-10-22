@@ -44,8 +44,9 @@ async function cargarPropiedad() {
 // --- Renderizar todo ---
 function renderizarPropiedad(p) {
 
-  // Ordenar imágenes: principal primero
-  imagenes = [...p.Imagenes].sort((a, b) => b.is_main - a.is_main)
+  // Ordenar: foto principal primero, después los videos y después el resto de las fotos
+  imagenes = [...p.Imagenes].sort((a, b) =>
+    (b.is_main - a.is_main) || (esVideo(b.image_url) - esVideo(a.image_url)))
 
   // Breadcrumb
   document.getElementById('breadcrumbTitulo').textContent = p.title
@@ -101,6 +102,7 @@ if (p.TotalMeters) {
   document.getElementById('detalleDescripcion').textContent = p.description || 'Sin descripción disponible.'
   
 imagenes.forEach(img => {
+  if (esVideo(img.image_url)) return
   const i = new Image()
   i.src = optimizarImagen(img.image_url)
 })
