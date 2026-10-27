@@ -401,6 +401,18 @@ document.getElementById("btnAplicarPrecio").addEventListener("click", () => {
   cargarResultados(true);
 });
 
+// Enter en Mínimo o Máximo hace lo mismo que tocar el botón
+function aplicarConEnter(input, boton) {
+  input.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    input.blur();
+    boton.click();
+  });
+}
+aplicarConEnter(inputMin, document.getElementById("btnAplicarPrecio"));
+aplicarConEnter(inputMax, document.getElementById("btnAplicarPrecio"));
+
 document.getElementById("btnLimpiarPrecio").addEventListener("click", () => {
   sliderMin.value = 0;
   sliderMax.value = PRECIO_MAX_DEFAULT;
@@ -547,6 +559,8 @@ btnAplicarMovil.addEventListener("click", () => {
   actualizarBadge();
   cargarResultados(true);
 });
+aplicarConEnter(inputMinM, btnAplicarMovil);
+aplicarConEnter(inputMaxM, btnAplicarMovil);
 
 // Limpiar: solo resetea dentro del modal (sin cerrar)
 btnLimpiarMovil.addEventListener("click", () => {
