@@ -83,9 +83,9 @@ function renderPropiedades(){
 </h3>
 
 
-<p>${propiedad.Tipos.name} • ${propiedad.Operaciones.name}</p>
+<p>${[propiedad.Tipos?.name?.trim(), propiedad.Operaciones?.name?.trim()].filter(Boolean).join(' • ')}</p>
 
-<p>${propiedad.Barrios.name}</p>
+${propiedad.Barrios?.name?.trim() ? `<p>${propiedad.Barrios.name.trim()}</p>` : ''}
 
 <button>Ver propiedad</button>
 
@@ -159,13 +159,8 @@ async function cargarFiltros() {
     .from('Tipos')
     .select('*')
 
-  const { data: barrios } = await supabaseClient
-    .from('Barrios')
-    .select('*')
-
   const filtroOperacion = document.getElementById("filtroOperacion")
   const filtroTipo = document.getElementById("filtroTipo")
-  const filtroBarrio = document.getElementById("filtroBarrio")
 
   operaciones.forEach(op => {
     filtroOperacion.innerHTML += `<option value="${op.id}">${op.name}</option>`
@@ -173,10 +168,6 @@ async function cargarFiltros() {
 
   tipos.forEach(tipo => {
     filtroTipo.innerHTML += `<option value="${tipo.id}">${tipo.name}</option>`
-  })
-
-  barrios.forEach(barrio => {
-    filtroBarrio.innerHTML += `<option value="${barrio.id}">${barrio.name}</option>`
   })
 
 }
@@ -220,35 +211,95 @@ async function filtrar(){
 }
 
 
+// ── Barrios: se cargan una sola vez y se buscan sin importar acentos ni mayúsculas ──
+let barriosPromesa = null
+let pedidoSugerencias = 0
+
+function normalizarTexto(texto){
+  return (texto || '')
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+async function cargarListaBarrios(){
+  const [resBarrios, resProps] = await Promise.all([
+    supabaseClient.from('Barrios').select('id, name'),
+    supabaseClient.from('Propiedades').select('Barrios_id')
+  ])
+  if(resBarrios.error) throw resBarrios.error
+  const hayConteo = !resProps.error && Array.isArray(resProps.data)
+  const conPropiedades = new Set((resProps.data || []).map(p => p.Barrios_id))
+  return (resBarrios.data || []).map(b => ({
+    id: b.id,
+    name: (b.name || '').trim(),
+    clave: normalizarTexto(b.name),
+    conPropiedades: !hayConteo || conPropiedades.has(b.id)
+  }))
+}
+
+function obtenerBarrios(){
+  if(!barriosPromesa){
+    barriosPromesa = cargarListaBarrios().catch(e => {
+      barriosPromesa = null
+      throw e
+    })
+  }
+  return barriosPromesa
+}
+
+// Sugerencias: solo barrios con propiedades, sin repetidos, primero los que empiezan igual
+async function sugerenciasDeBarrio(texto){
+  const clave = normalizarTexto(texto)
+  if(!clave) return []
+  const barrios = await obtenerBarrios()
+  const vistos = new Set()
+  return barrios
+    .filter(b => b.conPropiedades && b.clave.includes(clave))
+    .sort((a, b) => (b.clave.startsWith(clave) - a.clave.startsWith(clave)) || a.name.localeCompare(b.name, 'es'))
+    .filter(b => !vistos.has(b.clave) && vistos.add(b.clave))
+}
+
 async function buscarBarrios(){
 
-  const texto = filtroBarrio.value
+  const input = document.getElementById("filtroBarrio")
+  const texto = input.value
   const contenedor = document.getElementById("sugerenciasBarrios")
+  const miPedido = ++pedidoSugerencias
+  indiceSeleccionado = -1
 
-  if(texto.length < 1){
+  if(!texto.trim()){
     contenedor.innerHTML = ""
     return
   }
 
-  const { data } = await supabaseClient
-    .from('Barrios')
-    .select('*')
-    .ilike('name', `%${texto}%`)
+  let lista = []
+  try{
+    lista = await sugerenciasDeBarrio(texto)
+  }catch(e){
+    console.log("Error cargando barrios:", e)
+  }
+  if(miPedido !== pedidoSugerencias || input.value !== texto) return
 
   contenedor.innerHTML = ""
 
-  data.forEach(barrio => {
-    contenedor.innerHTML += `
-    <div class="sugerencia" onclick="seleccionarBarrio('${barrio.name}')">
-      ${barrio.name}
-    </div>
-  `
+  lista.forEach(barrio => {
+    const d = document.createElement("div")
+    d.className = "sugerencia"
+    d.textContent = barrio.name
+    d.addEventListener("click", () => seleccionarBarrio(barrio.name))
+    contenedor.appendChild(d)
   })
 
 }
 
 
-window.seleccionarBarrio = function(nombre){
+function seleccionarBarrio(nombre){
+
+  pedidoSugerencias++
+  indiceSeleccionado = -1
 
   const input = document.getElementById("filtroBarrio")
 
@@ -257,6 +308,7 @@ window.seleccionarBarrio = function(nombre){
   document.getElementById("sugerenciasBarrios").innerHTML = ""
 
 }
+window.seleccionarBarrio = seleccionarBarrio
 
 
 
@@ -275,47 +327,48 @@ document.addEventListener("click", function(event){
 
 })
 
-document.getElementById("filtroBarrio").addEventListener("keydown", function(e){
-
-  if(e.key === "Enter"){
-
-    const dropdown = document.getElementById("sugerenciasBarrios")
-
-    if(dropdown.innerHTML.trim() !== ""){
-      return
-    }
-
-    document.getElementById("btnBuscar").click()
-
-  }
-
-})
-
 function manejarTeclas(e){
 
-  const items = document.querySelectorAll(".sugerencia")
+  const contenedor = document.getElementById("sugerenciasBarrios")
+  const items = contenedor.querySelectorAll(".sugerencia")
+
+  // Enter: si hay un barrio marcado con las flechas, se elige ese; después se busca
+  if(e.key === "Enter"){
+    e.preventDefault()
+    if(indiceSeleccionado >= 0 && items[indiceSeleccionado]){
+      items[indiceSeleccionado].click()
+    }
+    pedidoSugerencias++
+    indiceSeleccionado = -1
+    contenedor.innerHTML = ""
+    document.getElementById("btnBuscar").click()
+    return
+  }
+
+  if(e.key === "Escape"){
+    pedidoSugerencias++
+    indiceSeleccionado = -1
+    contenedor.innerHTML = ""
+    return
+  }
 
   if(items.length === 0) return
 
   if(e.key === "ArrowDown"){
+    e.preventDefault()
     indiceSeleccionado++
     if(indiceSeleccionado >= items.length) indiceSeleccionado = 0
   }
 
   if(e.key === "ArrowUp"){
+    e.preventDefault()
     indiceSeleccionado--
     if(indiceSeleccionado < 0) indiceSeleccionado = items.length - 1
   }
 
-  if(e.key === "Enter"){
-    if(indiceSeleccionado >= 0){
-      items[indiceSeleccionado].click()
-    }
-  }
-
   items.forEach(item => item.classList.remove("activo"))
 
-  if(indiceSeleccionado >= 0){
+  if(indiceSeleccionado >= 0 && items[indiceSeleccionado]){
     items[indiceSeleccionado].classList.add("activo")
   }
 
@@ -337,9 +390,11 @@ btnBuscar.addEventListener("click", function(){
 
 
 
-filtroBarrio.addEventListener("keydown", manejarTeclas)
+document.getElementById("filtroBarrio").addEventListener("keydown", manejarTeclas)
+document.getElementById("filtroBarrio").addEventListener("input", buscarBarrios)
 
 
 
 cargarPropiedades()
 cargarFiltros()
+obtenerBarrios().catch(e => console.log("Error cargando barrios:", e))

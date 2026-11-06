@@ -8,8 +8,66 @@ const supabaseClient = window.supabase.createClient(
 let paginaActual = 1;
 const cantidadPorPagina = 9;
 let ordenActual = '';
+let cargaActual = 0;
 
 const whatsapp = document.querySelector('.whatsapp-float');
+
+// ── Barrios: se cargan una sola vez y se buscan sin importar acentos ni mayúsculas ──
+let barriosPromesa = null;
+
+function normalizarTexto(texto) {
+  return (texto || '')
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+async function cargarListaBarrios() {
+  const [resBarrios, resProps] = await Promise.all([
+    supabaseClient.from('Barrios').select('id, name'),
+    supabaseClient.from('Propiedades').select('Barrios_id')
+  ]);
+  if (resBarrios.error) throw resBarrios.error;
+  const hayConteo = !resProps.error && Array.isArray(resProps.data);
+  const conPropiedades = new Set((resProps.data || []).map(p => p.Barrios_id));
+  return (resBarrios.data || []).map(b => ({
+    id: b.id,
+    name: (b.name || '').trim(),
+    clave: normalizarTexto(b.name),
+    conPropiedades: !hayConteo || conPropiedades.has(b.id)
+  }));
+}
+
+function obtenerBarrios() {
+  if (!barriosPromesa) {
+    barriosPromesa = cargarListaBarrios().catch(e => {
+      barriosPromesa = null; // la próxima vez se vuelve a intentar
+      throw e;
+    });
+  }
+  return barriosPromesa;
+}
+
+// Ids de todos los barrios cuyo nombre contiene lo que se escribió
+async function idsDeBarrio(texto) {
+  const clave = normalizarTexto(texto);
+  const barrios = await obtenerBarrios();
+  return barrios.filter(b => b.clave.includes(clave)).map(b => b.id);
+}
+
+// Sugerencias: solo barrios con propiedades, sin repetidos, primero los que empiezan igual
+async function sugerenciasDeBarrio(texto) {
+  const clave = normalizarTexto(texto);
+  if (!clave) return [];
+  const barrios = await obtenerBarrios();
+  const vistos = new Set();
+  return barrios
+    .filter(b => b.conPropiedades && b.clave.includes(clave))
+    .sort((a, b) => (b.clave.startsWith(clave) - a.clave.startsWith(clave)) || a.name.localeCompare(b.name, 'es'))
+    .filter(b => !vistos.has(b.clave) && vistos.add(b.clave));
+}
 
 async function inicializarFiltros() {
   const { data: operaciones } = await supabaseClient.from('Operaciones').select('*');
@@ -36,6 +94,7 @@ async function inicializarFiltros() {
 
 async function cargarResultados(resetearPagina = false) {
 
+  const miCarga = ++cargaActual;
   const contenedor = document.getElementById("contenedorResultados");
 
   // Mostrar loading en lugar de las cards
@@ -73,7 +132,26 @@ async function cargarResultados(resetearPagina = false) {
 
   if (operacion) query = query.eq('Operaciones_id', operacion);
   if (tipo) query = query.eq('Tipos_id', tipo);
-  if (barrio) query = query.ilike('Barrios.name', `%${barrio}%`);
+
+  // Barrio: se filtran las propiedades por los barrios que coinciden
+  // (antes traía todas y a las de otros barrios les ponía "N/A")
+  if (barrio.trim()) {
+    let ids;
+    try {
+      ids = await idsDeBarrio(barrio);
+    } catch (e) {
+      console.log("Error cargando barrios:", e);
+      if (miCarga === cargaActual) contenedor.innerHTML = "<p>Error cargando propiedades.</p>";
+      return;
+    }
+    if (miCarga !== cargaActual) return;
+    if (ids.length === 0) {
+      mostrarResultados([]);
+      renderizarPaginacion(0);
+      return;
+    }
+    query = query.in('Barrios_id', ids);
+  }
 
   if (dormitorios) query = query.gte('bedrooms', dormitorios);
   if (precioMin) query = query.gte('price', precioMin);
@@ -88,6 +166,9 @@ async function cargarResultados(resetearPagina = false) {
   query = query.range(inicioRango, finRango);
 
   const { data, count, error } = await query;
+
+  // Si mientras tanto se pidió otra búsqueda, esta ya no se muestra
+  if (miCarga !== cargaActual) return;
 
   console.log("DATA:", data);
 console.log("ERROR:", error);
@@ -129,11 +210,12 @@ if (propiedad.Imagenes && propiedad.Imagenes.length > 0) {
   imagenUrl = optimizarImagen(urlOriginal);
 }
 
-    const nombreTipo = propiedad.Tipos ? propiedad.Tipos.name : 'N/A';
-    const nombreOperacion = propiedad.Operaciones ? propiedad.Operaciones.name : 'N/A';
-    const nombreBarrio = propiedad.Barrios ? propiedad.Barrios.name : 'N/A';
+    const nombreTipo = propiedad.Tipos?.name?.trim() || '';
+    const nombreOperacion = propiedad.Operaciones?.name?.trim() || '';
+    const nombreBarrio = propiedad.Barrios?.name?.trim() || '';
 
     const cantDormitorios = propiedad.bedrooms ? propiedad.bedrooms : '-';
+    const detalles = [nombreTipo, nombreOperacion, `${cantDormitorios} Dorm.`].filter(Boolean).join(' • ');
 
     const card = `
         <div class="card-propiedad" onclick="verPropiedad(${propiedad.id})" style="cursor:pointer;">
@@ -143,8 +225,8 @@ if (propiedad.Imagenes && propiedad.Imagenes.length > 0) {
                 ${propiedad.Moneda === 'USD' ? 'USD' : propiedad.Moneda === 'EUR' ? '€' : '$'}
                 ${propiedad.price ? propiedad.price.toLocaleString('es-AR') : 'Consultar'}
                 </h3>
-                <p class="detalles">${nombreTipo} • ${nombreOperacion} • ${cantDormitorios} Dorm.</p>
-                <p class="ubicacion">${nombreBarrio}</p>
+                <p class="detalles">${detalles}</p>
+                ${nombreBarrio ? `<p class="ubicacion">${nombreBarrio}</p>` : ''}
             </div>
         </div>
         `;
@@ -227,64 +309,90 @@ function renderizarPaginacion(totalItems) {
 }
 
 let indiceSeleccionado = -1;
+let pedidoSugerencias = 0;
 
 async function buscarBarrios() {
-  const texto = document.getElementById("filtroBarrio").value;
+  const input = document.getElementById("filtroBarrio");
+  const texto = input.value;
   const contenedor = document.getElementById("sugerenciasBarrios");
+  const miPedido = ++pedidoSugerencias;
+  indiceSeleccionado = -1;
 
-  if (texto.length < 1) {
+  if (!texto.trim()) {
     contenedor.innerHTML = "";
     cargarResultados(true);
     return;
   }
 
-  const { data } = await supabaseClient
-    .from('Barrios')
-    .select('*')
-    .ilike('name', `%${texto}%`);
+  let lista = [];
+  try {
+    lista = await sugerenciasDeBarrio(texto);
+  } catch (e) {
+    console.log("Error cargando barrios:", e);
+  }
+  // Si mientras tanto se siguió escribiendo o se apretó Enter, no se muestran
+  if (miPedido !== pedidoSugerencias || input.value !== texto) return;
 
   contenedor.innerHTML = "";
-  data.forEach(barrio => {
-    contenedor.innerHTML += `
-        <div class="sugerencia" onclick="seleccionarBarrio('${barrio.name}')">
-            ${barrio.name}
-        </div>
-        `;
+  lista.forEach(barrio => {
+    const d = document.createElement("div");
+    d.className = "sugerencia";
+    d.textContent = barrio.name;
+    d.addEventListener("click", () => seleccionarBarrio(barrio.name));
+    contenedor.appendChild(d);
   });
 }
 
-window.seleccionarBarrio = function (nombre) {
+function seleccionarBarrio(nombre) {
+  pedidoSugerencias++;
+  indiceSeleccionado = -1;
   document.getElementById("filtroBarrio").value = nombre;
   document.getElementById("sugerenciasBarrios").innerHTML = "";
   cargarResultados(true);
 }
+window.seleccionarBarrio = seleccionarBarrio;
 
 function manejarTeclas(e) {
-  const items = document.querySelectorAll(".sugerencia");
+  const contenedor = document.getElementById("sugerenciasBarrios");
+  const items = contenedor.querySelectorAll(".sugerencia");
 
-  if (e.key === "Enter" && items.length === 0) {
-    cargarResultados(true);
+  // Enter: si hay un barrio marcado con las flechas, se elige ese;
+  // si no, se busca lo que está escrito
+  if (e.key === "Enter") {
+    e.preventDefault();
+    if (indiceSeleccionado >= 0 && items[indiceSeleccionado]) {
+      items[indiceSeleccionado].click();
+    } else {
+      pedidoSugerencias++;
+      indiceSeleccionado = -1;
+      contenedor.innerHTML = "";
+      cargarResultados(true);
+    }
+    return;
+  }
+
+  if (e.key === "Escape") {
+    pedidoSugerencias++;
+    indiceSeleccionado = -1;
+    contenedor.innerHTML = "";
     return;
   }
 
   if (items.length === 0) return;
 
   if (e.key === "ArrowDown") {
+    e.preventDefault();
     indiceSeleccionado++;
     if (indiceSeleccionado >= items.length) indiceSeleccionado = 0;
   }
   if (e.key === "ArrowUp") {
+    e.preventDefault();
     indiceSeleccionado--;
     if (indiceSeleccionado < 0) indiceSeleccionado = items.length - 1;
   }
-  if (e.key === "Enter") {
-    if (indiceSeleccionado >= 0) {
-      items[indiceSeleccionado].click();
-    }
-  }
 
   items.forEach(item => item.classList.remove("activo"));
-  if (indiceSeleccionado >= 0) {
+  if (indiceSeleccionado >= 0 && items[indiceSeleccionado]) {
     items[indiceSeleccionado].classList.add("activo");
   }
 }
@@ -504,17 +612,24 @@ filtrosOverlay.addEventListener("click", cerrarModal);
 
 // Autocompletado de barrios dentro del modal
 async function buscarBarriosMovil() {
-  const texto = document.getElementById("filtroBarrioMovil").value;
+  const input = document.getElementById("filtroBarrioMovil");
+  const texto = input.value;
   const cont  = document.getElementById("sugerenciasBarriosMovil");
-  if (texto.length < 1) { cont.innerHTML = ""; return; }
-  const { data } = await supabaseClient.from('Barrios').select('*').ilike('name', `%${texto}%`);
+  if (!texto.trim()) { cont.innerHTML = ""; return; }
+  let lista = [];
+  try {
+    lista = await sugerenciasDeBarrio(texto);
+  } catch (e) {
+    console.log("Error cargando barrios:", e);
+  }
+  if (input.value !== texto) return;
   cont.innerHTML = "";
-  data.forEach(b => {
+  lista.forEach(b => {
     const d = document.createElement("div");
     d.className = "sugerencia";
     d.textContent = b.name;
     d.onclick = () => {
-      document.getElementById("filtroBarrioMovil").value = b.name;
+      input.value = b.name;
       cont.innerHTML = "";
     };
     cont.appendChild(d);
@@ -549,6 +664,7 @@ btnAplicarMovil.addEventListener("click", () => {
   document.getElementById("filtroTipo").value        = document.getElementById("filtroTipoMovil").value;
   document.getElementById("filtroDormitorios").value = document.getElementById("filtroDormitoriosMovil").value;
   document.getElementById("filtroBarrio").value      = document.getElementById("filtroBarrioMovil").value;
+  document.getElementById("sugerenciasBarriosMovil").innerHTML = "";
   sliderMin.value = sliderMinM.value;
   sliderMax.value = sliderMaxM.value;
   inputMin.value  = inputMinM.value;
@@ -561,6 +677,7 @@ btnAplicarMovil.addEventListener("click", () => {
 });
 aplicarConEnter(inputMinM, btnAplicarMovil);
 aplicarConEnter(inputMaxM, btnAplicarMovil);
+aplicarConEnter(document.getElementById("filtroBarrioMovil"), btnAplicarMovil);
 
 // Limpiar: solo resetea dentro del modal (sin cerrar)
 btnLimpiarMovil.addEventListener("click", () => {
@@ -634,4 +751,5 @@ setupOrdenar('btnOrdenar', 'ordenarDropdown', 'ordenar-opcion');
 setupOrdenar('btnOrdenarMovil', 'ordenarDropdownMovil', 'ordenar-opcion-movil');
 
 actualizarFill();
+obtenerBarrios().catch(e => console.log("Error cargando barrios:", e));
 inicializarFiltros();
