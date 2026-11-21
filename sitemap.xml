@@ -11,6 +11,10 @@
   </url>
   <url>
     <loc>https://vitriolinmobiliaria.com/resultados.html</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://vitriolinmobiliaria.com/resultados.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vitriolinmobiliaria.com/en/properties.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://vitriolinmobiliaria.com/de/immobilien.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://vitriolinmobiliaria.com/en/properties.html"/>
     <lastmod>2026-11-21</lastmod>
     <priority>0.8</priority>
   </url>
@@ -777,6 +781,15 @@
     <priority>0.9</priority>
   </url>
   <url>
+    <loc>https://vitriolinmobiliaria.com/en/properties.html</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://vitriolinmobiliaria.com/resultados.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vitriolinmobiliaria.com/en/properties.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://vitriolinmobiliaria.com/de/immobilien.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://vitriolinmobiliaria.com/en/properties.html"/>
+    <lastmod>2026-11-21</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://vitriolinmobiliaria.com/en/costa-del-sol.html</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://vitriolinmobiliaria.com/en/costa-del-sol.html"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://vitriolinmobiliaria.com/de/costa-del-sol.html"/>
@@ -916,6 +929,15 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://vitriolinmobiliaria.com/en/"/>
     <lastmod>2026-11-21</lastmod>
     <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vitriolinmobiliaria.com/de/immobilien.html</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://vitriolinmobiliaria.com/resultados.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vitriolinmobiliaria.com/en/properties.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://vitriolinmobiliaria.com/de/immobilien.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://vitriolinmobiliaria.com/en/properties.html"/>
+    <lastmod>2026-11-21</lastmod>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://vitriolinmobiliaria.com/de/costa-del-sol.html</loc>

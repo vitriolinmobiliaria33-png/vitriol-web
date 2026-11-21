@@ -251,8 +251,7 @@
     <script type="module" src="./js/propiedades.js?v=2"></script>
     <script type="module" src="./js/menu.js"></script>
   <script src="/js/whatsapp.js?v=1"></script>
-  <script>fetch('/en/mapa.json').then(function(r){return r.json()}).then(function(m){var id=new URLSearchParams(location.search).get('id');var a=document.getElementById('linkIngles');if(a&&m[id]){a.href=m[id];}}).catch(function(){});</script>
-  <script>fetch('/de/mapa.json').then(function(r){return r.json()}).then(function(m){var id=new URLSearchParams(location.search).get('id');var a=document.getElementById('linkAleman');if(a&&m[id]){a.href=m[id];}}).catch(function(){});</script>
+  <script data-idiomas-ficha>(function(){var id=new URLSearchParams(location.search).get('id');if(!id)return;[['en','linkIngles','/en/property.html'],['de','linkAleman','/de/immobilie.html']].forEach(function(x){var a=document.getElementById(x[1]);if(!a)return;a.href=x[2]+'?id='+encodeURIComponent(id);fetch('/'+x[0]+'/mapa.json').then(function(r){return r.json()}).then(function(m){if(m[id])a.href=m[id];}).catch(function(){});});})();</script>
 </body>
 
 </html>
