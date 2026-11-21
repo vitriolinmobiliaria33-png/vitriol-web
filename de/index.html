@@ -22,7 +22,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <script type="application/ld+json">{"@context": "https://schema.org", "@type": "RealEstateAgent", "name": "Vitriol Inmobiliaria", "url": "https://vitriolinmobiliaria.com/de/", "logo": "https://vitriolinmobiliaria.com/recursos/Logo%20de%20VITRIOL%20Inmobiliaria%20en%20oro.png", "image": "https://vitriolinmobiliaria.com/recursos/hero_poster.jpg", "description": "Luxusimmobilien und Bauland in Argentinien (Buenos Aires, Córdoba und Atlantikküste) und an der Costa del Sol in Spanien.", "telephone": "+54 9 351 276 1400", "email": "contacto@vitriolinmobiliaria.com", "address": {"@type": "PostalAddress", "streetAddress": "Rosario de Santa Fe 1415, B° General Paz", "addressLocality": "Córdoba", "addressRegion": "Córdoba", "addressCountry": "AR"}, "areaServed": ["Argentinien", "Costa del Sol, Spanien"], "knowsLanguage": ["es", "en"], "sameAs": ["https://www.instagram.com/vitriolinmobiliaria/", "https://www.facebook.com/profile.php?id=61590992300507"]}</script>
   <link rel="stylesheet" href="/css/index.css">
-  <link rel="stylesheet" href="/css/en.css?v=3">
+  <link rel="stylesheet" href="/css/en.css?v=4">
   <link rel="stylesheet" href="/css/botones.css?v=2">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="icon" href="/recursos/Logo%20de%20VITRIOL%20Inmobiliaria%20en%20oro.png">
@@ -44,6 +44,7 @@
     </button>
     <nav class="navbar-links" id="id_menuNav">
       <a href="/de/">Start</a>
+      <a href="/de/immobilien.html">Immobilien</a>
       <a href="/de/costa-del-sol.html">Costa del Sol</a>
       <a href="/de/argentinien.html">Argentinien</a>
       <a href="/de/bauland.html">Bauland</a>
@@ -67,10 +68,27 @@
         </div>
         <h1>Immobilien über Grenzen hinweg</h1>
         <p>Luxusimmobilien und Bauland in Argentinien und an der Costa del Sol in Spanien. Persönliche Beratung auf beiden Seiten des Atlantiks.</p>
-        <div class="en-hero-btns">
+        <div class="buscador" id="biBuscador">
+          <select id="filtroOperacion" aria-label="Kaufen oder mieten">
+            <option value="" disabled selected hidden>Kaufen oder mieten</option>
+            <option value="">Alle</option>
+            <option value="1">Kaufen</option>
+            <option value="2">Mieten</option>
+          </select>
+          <select id="filtroTipo" aria-label="Immobilienart">
+            <option value="" disabled selected hidden>Immobilienart</option>
+            <option value="">Alle Immobilienarten</option>
+          </select>
+          <div class="buscador-barrio">
+            <input type="text" id="filtroBarrio" placeholder="Ort suchen" aria-label="Ort suchen" autocomplete="off">
+            <div id="sugerenciasBarrios"></div>
+          </div>
+          <button id="btnBuscar" type="button">Immobilien suchen</button>
+        </div>
+        <div class="en-hero-btns compactos">
           <a class="en-btn" href="/de/costa-del-sol.html">Costa del Sol</a>
           <a class="en-btn" href="/de/argentinien.html">Argentinien</a>
-          <a class="en-btn en-btn-linea" href="/de/bauland.html">Bauland für Projektentwickler</a>
+          <a class="en-btn" href="/de/bauland.html">Bauland für Projektentwickler</a>
         </div>
       </div>
     </section>
@@ -242,6 +260,7 @@
       <div class="footer-info">
         <p class="footer-titulo">Entdecken</p>
         <div class="info-item"><a href="/de/" class="link-ubicacion">Start</a></div>
+        <div class="info-item"><a href="/de/immobilien.html" class="link-ubicacion">Alle Immobilien zum Kauf und zur Miete</a></div>
         <div class="info-item"><a href="/de/costa-del-sol.html" class="link-ubicacion">Costa del Sol, Spanien</a></div>
         <div class="info-item"><a href="/de/argentinien.html" class="link-ubicacion">Argentinien</a></div>
         <div class="info-item"><a href="/de/bauland.html" class="link-ubicacion">Bauland für Projektentwickler</a></div>
@@ -264,6 +283,7 @@
   </footer>
 
   <script src="/js/menu.js"></script>
+  <script src="/js/buscador_idiomas.js?v=1"></script>
   <script src="/js/whatsapp.js?v=1"></script>
 </body>
 
