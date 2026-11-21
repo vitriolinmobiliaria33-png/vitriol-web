@@ -18,7 +18,12 @@ body.en-page {
 .en-page .idioma-switch::after { display: none; }
 /* 21/11/2026: con FAQ y dos idiomas en el menú, el rótulo del centro no entra por debajo de unos
    1.780 px (lo oculta botones.css) y en alemán, con palabras más largas, por debajo de 1.850 px. */
-@media (max-width: 1850px) {
+/* 21/11/2026 (tarde): con "Properties" / "Immobilien" en el menú, el rótulo se pisa más abajo de
+   unos 1.850 px en inglés y 1.950 px en alemán (medido en las páginas nuevas). */
+@media (max-width: 1870px) {
+  .en-page .navbar::after { display: none; }
+}
+@media (max-width: 1970px) {
   html[lang="de"] .en-page .navbar::after { display: none; }
 }
 /* 21/11/2026: el menú suma un segundo idioma (Español + Deutsch / Español + English). */
@@ -361,3 +366,195 @@ body.en-page {
   .en-cabecera h1 { font-size: 28px; }
   .en-btn { width: 100%; }
 }
+
+/* ============================================================
+   21/11/2026 — Buscador, listado de todas las propiedades y ficha genérica
+   (js/buscador_idiomas.js). Martín: "operación, tipo, buscar propiedad… quiero ver
+   si puedo comprar o alquilar todo", en inglés y en alemán.
+============================================================ */
+
+/* Inicio: el buscador va en el hero, como en español; las zonas quedan como botones chicos */
+.en-inicio .hero-content { max-width: 760px; }
+.en-inicio .hero-content > p { margin-bottom: 22px; }
+.en-inicio .buscador { margin: 0 auto; }
+.en-inicio .buscador select,
+.en-inicio .buscador input { min-width: 0; }
+@media (min-width: 901px) { .en-inicio .buscador select { flex: 1 1 150px; } }
+.en-hero-btns.compactos { margin-top: 18px; gap: 10px; }
+.en-hero-btns.compactos .en-btn {
+  padding: 7px 14px;
+  font-size: 13px;
+  background: rgba(10, 10, 10, 0.55);
+  color: var(--gold-light);
+}
+.en-hero-btns.compactos .en-btn:hover { background: var(--gold); color: #0a0a0a; }
+
+/* Listado */
+.bi-lista .bi-h1 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 36px;
+  line-height: 1.2;
+  color: var(--gold-light);
+  margin-bottom: 8px;
+}
+.bi-intro { color: #b9b2a3; margin-bottom: 22px; max-width: 820px; }
+
+.bi-btn-filtros {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  padding: 10px 18px;
+  border: 1px solid var(--gold);
+  border-radius: 8px;
+  background: #141414;
+  color: var(--gold-light);
+  font: 600 14px Inter, sans-serif;
+  cursor: pointer;
+}
+
+.bi-barra {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: stretch;
+  background: #141414;
+  border: 1px solid rgba(201, 168, 76, 0.35);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 18px;
+}
+.bi-barra select,
+.bi-barra input,
+.bi-control {
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid rgba(201, 168, 76, 0.35);
+  border-radius: 8px;
+  background: #0c0c0c;
+  color: #e9e4d8;
+  font: 500 14px Inter, sans-serif;
+  outline: none;
+}
+.bi-barra select:focus,
+.bi-barra input:focus,
+.bi-control:focus { border-color: var(--gold); }
+.bi-barra select { flex: 1 1 150px; cursor: pointer; }
+.bi-barra select option { background: #141414; color: #e9e4d8; }
+.bi-control {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 140px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.bi-control::after { content: '▾'; color: var(--gold-light); font-size: 12px; }
+.bi-control.activo { border-color: var(--gold); color: var(--gold-light); }
+
+.bi-precio { position: relative; flex: 1 1 150px; display: flex; }
+.bi-precio .bi-control { flex: 1; }
+.bi-precio-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 60;
+  width: 300px;
+  max-width: calc(100vw - 40px);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #141414;
+  border: 1px solid var(--gold);
+  border-radius: 10px;
+  padding: 16px;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.55);
+}
+.bi-precio-panel[hidden] { display: none; }
+.bi-precio-panel label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #b9b2a3; }
+.bi-precio-panel label input,
+.bi-precio-panel label select { width: 100%; }
+.bi-precio-fila { display: flex; gap: 10px; }
+.bi-precio-fila label { flex: 1; }
+.bi-precio-nota { font-size: 12px; color: #9d9686; }
+.bi-precio-btns { display: flex; gap: 10px; justify-content: flex-end; }
+.bi-precio-btns button {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid var(--gold);
+  background: transparent;
+  color: var(--gold-light);
+  font: 600 13px Inter, sans-serif;
+  cursor: pointer;
+}
+.bi-precio-btns button:last-child { background: var(--gold); color: #0a0a0a; }
+
+.bi-lugar { position: relative; flex: 2 1 220px; display: flex; }
+.bi-lugar input { flex: 1; width: 100%; }
+.bi-lugar input::placeholder { color: #8f887a; }
+.bi-sug {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 55;
+  background: #141414;
+  border: 1px solid rgba(201, 168, 76, 0.5);
+  border-radius: 8px;
+  overflow: hidden;
+  display: none;
+}
+.bi-sug.abierta { display: block; }
+.bi-sug .sugerencia { color: #e9e4d8; }
+
+.bi-cuenta { color: #b9b2a3; font-size: 14px; margin-bottom: 14px; }
+.bi-card-tag {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #b9b2a3;
+}
+.bi-cargando { color: #b9b2a3; padding: 40px 0; text-align: center; grid-column: 1 / -1; }
+.bi-vacio { grid-column: 1 / -1; text-align: center; padding: 40px 0; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.bi-vacio p { color: #d9d3c5; font-size: 17px; }
+
+.bi-paginas { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin: 30px 0 8px; }
+.bi-paginas button,
+.bi-paginas span {
+  min-width: 40px;
+  height: 40px;
+  padding: 0 10px;
+  border-radius: 8px;
+  font: 600 14px Inter, sans-serif;
+}
+.bi-paginas button {
+  border: 1px solid rgba(201, 168, 76, 0.4);
+  background: #141414;
+  color: #e9e4d8;
+  cursor: pointer;
+}
+.bi-paginas button.activa { background: var(--gold); border-color: var(--gold); color: #0a0a0a; }
+.bi-paginas button:disabled { opacity: 0.35; cursor: default; }
+.bi-paginas span { display: inline-flex; align-items: center; justify-content: center; color: #9d9686; }
+
+/* Ficha genérica */
+.bi-desc { white-space: pre-line; color: #e9e4d8; line-height: 1.65; }
+.bi-desc-auto { font-style: italic; color: #d9d3c5; }
+.bi-volver { margin-top: 22px; }
+.bi-volver a { color: var(--gold-light); text-decoration: underline; }
+
+@media (max-width: 900px) {
+  .bi-btn-filtros { display: inline-flex; }
+  .bi-barra { display: none; flex-direction: column; }
+  .bi-barra.abierta { display: flex; }
+  .bi-barra select, .bi-precio, .bi-lugar { flex: none; width: 100%; }
+  .bi-precio-panel { width: 100%; max-width: none; }
+}
+@media (max-width: 640px) {
+  .bi-lista .bi-h1 { font-size: 28px; }
+  .en-hero-btns.compactos .en-btn { width: auto; }
+  .en-inicio .hero-content { margin-top: 4vh; }
+}
+.en-card-precio span { white-space: nowrap; }
