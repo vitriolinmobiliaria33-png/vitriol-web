@@ -16,9 +16,19 @@ body.en-page {
   padding: 4px 10px !important;
 }
 .en-page .idioma-switch::after { display: none; }
-/* 21/11/2026: con "FAQ" en el menú, el rótulo del centro tocaba "Home" por debajo de unos 1.415 px. */
-@media (max-width: 1420px) {
-  .en-page .navbar::after { display: none; }
+/* 21/11/2026: con FAQ y dos idiomas en el menú, el rótulo del centro no entra por debajo de unos
+   1.780 px (lo oculta botones.css) y en alemán, con palabras más largas, por debajo de 1.850 px. */
+@media (max-width: 1850px) {
+  html[lang="de"] .en-page .navbar::after { display: none; }
+}
+/* 21/11/2026: el menú suma un segundo idioma (Español + Deutsch / Español + English). */
+@media (min-width: 901px) and (max-width: 1280px) {
+  .en-page .navbar-links { gap: 1.1rem; }
+  .en-page .navbar-links a { font-size: 14px; letter-spacing: 0.05em; }
+  .en-page .idioma-switch { padding: 3px 8px !important; }
+}
+@media (max-width: 900px) {
+  .en-page .navbar-links { overflow-y: auto; }
 }
 
 .en-main {

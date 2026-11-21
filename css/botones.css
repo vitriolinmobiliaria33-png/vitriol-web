@@ -49,6 +49,35 @@ img.bandera {
   height: 14px !important;
 }
 
+/* Desde el 21/11/2026 van dos idiomas juntos arriba del título (English y Deutsch, etc.) */
+.idiomas-hero {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.idiomas-hero .idioma-hero {
+  margin-bottom: 0;
+}
+
+/* Menú de la PC con dos idiomas: en pantallas medianas quedan solo las banderas (el nombre sigue en el title) */
+@media (min-width: 901px) and (max-width: 1100px) {
+  .navbar-links .idioma-switch {
+    font-size: 0 !important;
+    gap: 0;
+    padding: 5px 7px !important;
+  }
+}
+
+/* Con los idiomas en el menú, el rótulo del centro de la barra no entra por debajo de unos 1.780 px */
+@media (max-width: 1780px) {
+  .navbar:has(.idioma-switch)::after {
+    display: none;
+  }
+}
+
 /* ── WhatsApp ────────────────────────────────────────────── */
 /* En el celular queda el botón redondo de siempre, abajo a la derecha. */
 .whatsapp-float .wa-texto {
