@@ -1,0 +1,95 @@
+/* ============================================================
+   VITRIOL INMOBILIARIA — Botón de WhatsApp y selector de idioma
+   (21/11/2026). Se carga al final, después de los otros CSS.
+============================================================ */
+
+/* ── Banderas del selector de idioma ─────────────────────── */
+/* !important porque index.css pone todas las imágenes del menú en 80 px (.navbar img). */
+img.bandera {
+  height: 13px !important;
+  width: auto !important;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35);
+  flex: none;
+}
+
+/* Selector de idioma en el menú de las páginas internas */
+.idioma-switch {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Selector de idioma del inicio: arriba del título */
+.idioma-hero {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+  padding: 9px 18px;
+  border: 1px solid #c9a84c;
+  border-radius: 999px;
+  background: rgba(10, 10, 10, 0.55);
+  color: #e2c47a;
+  font: 600 14px/1 Inter, sans-serif;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  transition: background 0.25s, color 0.25s;
+}
+
+.idioma-hero:hover {
+  background: #c9a84c;
+  color: #0a0a0a;
+}
+
+.idioma-hero img.bandera {
+  height: 14px !important;
+}
+
+/* ── WhatsApp ────────────────────────────────────────────── */
+/* En el celular queda el botón redondo de siempre, abajo a la derecha. */
+.whatsapp-float .wa-texto {
+  display: none;
+}
+
+/* En la PC: abajo al centro, grande y con texto. */
+@media (min-width: 769px) {
+  .whatsapp-float {
+    left: 50% !important;
+    right: auto !important;
+    bottom: 26px !important;
+    transform: translateX(-50%);
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 7px 26px 7px 7px;
+    background: #25d366;
+    border-radius: 999px;
+    color: #ffffff;
+    font: 600 17px/1 Inter, sans-serif;
+    letter-spacing: 0.02em;
+    text-decoration: none;
+    box-shadow: 0 8px 26px rgba(0, 0, 0, 0.45);
+    filter: none;
+    transition: transform 0.25s, box-shadow 0.25s, background 0.25s;
+  }
+
+  .whatsapp-float:hover {
+    transform: translateX(-50%) translateY(-3px);
+    background: #1ebe5d;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+  }
+
+  .whatsapp-float img {
+    width: 44px !important;
+    height: 44px !important;
+  }
+
+  .whatsapp-float .wa-texto {
+    display: inline;
+    white-space: nowrap;
+  }
+}
