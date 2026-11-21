@@ -16,7 +16,8 @@ body.en-page {
   padding: 4px 10px !important;
 }
 .en-page .idioma-switch::after { display: none; }
-@media (max-width: 1320px) {
+/* 21/11/2026: con "FAQ" en el menú, el rótulo del centro tocaba "Home" por debajo de unos 1.415 px. */
+@media (max-width: 1420px) {
   .en-page .navbar::after { display: none; }
 }
 
