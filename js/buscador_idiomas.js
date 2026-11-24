@@ -1,8 +1,9 @@
 /* ============================================================
-   VITRIOL INMOBILIARIA — Buscador, listado y ficha en inglés (/en/) y alemán (/de/)  (21/11/2026)
+   VITRIOL INMOBILIARIA — Buscador, listado y ficha en inglés (/en/), alemán (/de/),
+   italiano (/it/) y francés (/fr/)  (21/11/2026; italiano y francés desde el 24/11/2026)
    - Lee Supabase en vivo, solo lectura: qué propiedades están publicadas, precio, fotos y datos.
      Así una baja o un cambio de precio en la web se ven enseguida también en inglés y en alemán.
-   - Los títulos y las descripciones traducidos salen de /en/textos.json y /de/textos.json
+   - Los títulos y las descripciones traducidos salen de /<idioma>/textos.json
      (los arma 156 - .../programas/armar_textos.py). Si una propiedad es nueva o cambió su texto
      en castellano y todavía no se tradujo, se muestra un texto armado con sus datos, en el idioma
      de la página: nunca en castellano.
@@ -11,8 +12,10 @@
 (function () {
   'use strict';
 
-  var L = /^de/i.test(document.documentElement.lang || '') ? 'de' : 'en';
-  var OTRO = L === 'de' ? 'en' : 'de';
+  var IDIOMAS = ['en', 'de', 'it', 'fr'];
+  var L = String(document.documentElement.lang || '').slice(0, 2).toLowerCase();
+  if (IDIOMAS.indexOf(L) === -1) L = 'en';
+  var LOCALE = { en: 'en-GB', de: 'de-DE', it: 'it-IT', fr: 'fr-FR' }[L];
   var SB = 'https://lirhxxvemagoyvlijfrj.supabase.co/rest/v1/';
   var KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxpcmh4eHZlbWFnb3l2bGlqZnJqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1OTUzMjYsImV4cCI6MjA4ODE3MTMyNn0.s-E_H_9awM0zZ_r14SH6NmEJ3Y4KeUo_R3CxQKQ7sDw';
   var WA = '5493512761400';
@@ -21,9 +24,16 @@
   var URLS = {
     es: { lista: '/resultados.html', ficha: '/propiedades.html' },
     en: { inicio: '/en/', lista: '/en/properties.html', ficha: '/en/property.html' },
-    de: { inicio: '/de/', lista: '/de/immobilien.html', ficha: '/de/immobilie.html' }
+    de: { inicio: '/de/', lista: '/de/immobilien.html', ficha: '/de/immobilie.html' },
+    it: { inicio: '/it/', lista: '/it/immobili.html', ficha: '/it/immobile.html' },
+    fr: { inicio: '/fr/', lista: '/fr/biens.html', ficha: '/fr/bien.html' }
   };
   var U = URLS[L];
+  // Links "ver esta propiedad en…" de la ficha: cada uno en su idioma.
+  var VER_EN = {
+    es: 'Ver esta propiedad en español', en: 'View this property in English', de: 'Diese Immobilie auf Deutsch ansehen',
+    it: 'Vedi questo immobile in italiano', fr: 'Voir ce bien en français'
+  };
 
   var TX = ({
     en: {
@@ -51,7 +61,6 @@
       interesado: 'Interested in this property?', btn_wa: 'WhatsApp us', btn_mail: 'Email us',
       nota_contacto: 'We reply in English. Mon–Fri 9:00–18:00 and Sat 9:00–13:00, Argentina time (GMT−3).',
       mapa_exacta: 'View the location on Google Maps', mapa_zona: 'View the area on Google Maps',
-      ver_es: 'Ver esta propiedad en español', ver_otro: 'Diese Immobilie auf Deutsch ansehen',
       inicio: 'Home', propiedades: 'Properties', volver: 'Back to all properties',
       no_esta: 'This property is no longer available.', ver_todas: 'See all properties',
       wa_prop: "Hello! I'm interested in this property: {t} ({u})", asunto: 'Enquiry: {t}',
@@ -83,14 +92,91 @@
       interesado: 'Interesse an dieser Immobilie?', btn_wa: 'Per WhatsApp schreiben', btn_mail: 'E-Mail schreiben',
       nota_contacto: 'Schreiben Sie uns gern auf Deutsch. Mo–Fr 9:00–18:00 und Sa 9:00–13:00 Uhr, argentinische Zeit (GMT−3).',
       mapa_exacta: 'Lage auf Google Maps ansehen', mapa_zona: 'Umgebung auf Google Maps ansehen',
-      ver_es: 'Ver esta propiedad en español', ver_otro: 'View this property in English',
       inicio: 'Start', propiedades: 'Immobilien', volver: 'Zurück zu allen Immobilien',
       no_esta: 'Diese Immobilie ist nicht mehr verfügbar.', ver_todas: 'Alle Immobilien ansehen',
       wa_prop: 'Hallo! Ich interessiere mich für diese Immobilie: {t} ({u})', asunto: 'Anfrage: {t}',
       nota_cambio: 'Ungefähre Umrechnung: 1 € = {eur} USD (Europäische Zentralbank, {f1}) und 1 USD = {ars} ARS (offizieller Kurs in Argentinien, {f2}). Maßgeblich ist der Preis in der Originalwährung.',
       foto: 'Foto', anterior: 'Vorherige Seite', siguiente: 'Nächste Seite'
+    },
+    it: {
+      todas_op: 'Comprare o affittare', comprar: 'Comprare', alquilar: 'Affittare',
+      todos_tipos: 'Tutte le tipologie', tipo: 'Tipologia', otro: 'Immobile',
+      lugar: 'Cerca una località', buscar: 'Cerca immobili',
+      dorm: 'Camere', dorm_n: 'Almeno {n} camere', cualquiera: 'Qualsiasi',
+      precio: 'Prezzo', moneda: 'Valuta', min: 'Min.', max: 'Max.', aplicar: 'Applica', limpiar: 'Azzera',
+      precio_desde: 'Da {a}', precio_hasta: 'Fino a {b}',
+      precio_nota: 'I prezzi in altre valute sono convertiti in modo approssimativo.',
+      orden: ['Più recenti', 'Prezzo crescente', 'Prezzo decrescente'], ordenar: 'Ordina per',
+      filtros: 'Filtri', limpiar_todo: 'Azzera tutti i filtri',
+      cuenta1: '1 immobile', cuenta: '{n} immobili',
+      ninguna: 'Nessun immobile corrisponde a questi filtri.',
+      cargando: 'Caricamento degli immobili…', cargando_ficha: 'Caricamento…',
+      error: 'Non è stato possibile caricare gli immobili. Riprovate tra qualche istante.',
+      ver: "Vedi l'immobile", venta: 'In vendita', alquiler: 'In affitto', por_mes: '/ mese',
+      consultar: 'Prezzo su richiesta',
+      dorm1: 'camera', dormN: 'camere', bano1: 'bagno', banoN: 'bagni',
+      m2_cub: 'm² coperti', m2_tot: 'm² totali', m2_lote: 'm² di terreno', cochera: 'Box auto', si: 'Sì',
+      credito: 'Mutuo', credito_si: 'finanziabile',
+      titulo_auto: { venta: '{tipo} in vendita – {lugar}', alquiler: '{tipo} in affitto – {lugar}' },
+      desc_auto: 'La descrizione completa in italiano di questo immobile è in arrivo. Scriveteci su WhatsApp e vi invieremo tutti i dettagli, le foto e i video.',
+      descripcion: 'Descrizione', fotos: 'Foto', video: 'Video',
+      interesado: 'Le interessa questo immobile?', btn_wa: 'Scriveteci su WhatsApp', btn_mail: "Inviateci un'e-mail",
+      nota_contacto: 'Potete scriverci in italiano. Lun–Ven 9:00–18:00 e Sab 9:00–13:00, ora argentina (GMT−3).',
+      mapa_exacta: 'Vedi la posizione su Google Maps', mapa_zona: 'Vedi la zona su Google Maps',
+      inicio: 'Home', propiedades: 'Immobili', volver: 'Torna a tutti gli immobili',
+      no_esta: 'Questo immobile non è più disponibile.', ver_todas: 'Vedi tutti gli immobili',
+      wa_prop: 'Buongiorno! Vorrei informazioni su questo immobile: {t} ({u})', asunto: 'Richiesta: {t}',
+      nota_cambio: 'Conversioni approssimative: 1 € = {eur} USD (Banca centrale europea, {f1}) e 1 USD = {ars} ARS (cambio ufficiale in Argentina, {f2}). Fa fede il prezzo nella valuta originale.',
+      foto: 'foto', anterior: 'Pagina precedente', siguiente: 'Pagina successiva'
+    },
+    fr: {
+      todas_op: 'Acheter ou louer', comprar: 'Acheter', alquilar: 'Louer',
+      todos_tipos: 'Tous les types de biens', tipo: 'Type de bien', otro: 'Bien',
+      lugar: 'Rechercher un lieu', buscar: 'Rechercher',
+      dorm: 'Chambres', dorm_n: 'Au moins {n} chambres', cualquiera: 'Indifférent',
+      precio: 'Prix', moneda: 'Devise', min: 'Min.', max: 'Max.', aplicar: 'Appliquer', limpiar: 'Effacer',
+      precio_desde: 'À partir de {a}', precio_hasta: "Jusqu'à {b}",
+      precio_nota: "Les prix dans d'autres devises sont convertis de façon approximative.",
+      orden: ['Plus récents', 'Prix croissant', 'Prix décroissant'], ordenar: 'Trier par',
+      filtros: 'Filtres', limpiar_todo: 'Effacer tous les filtres',
+      cuenta1: '1 bien', cuenta: '{n} biens',
+      ninguna: 'Aucun bien ne correspond à ces filtres.',
+      cargando: 'Chargement des biens…', cargando_ficha: 'Chargement…',
+      error: "Nous n'avons pas pu charger les biens. Veuillez réessayer dans un instant.",
+      ver: 'Voir le bien', venta: 'À vendre', alquiler: 'À louer', por_mes: '/ mois',
+      consultar: 'Prix sur demande',
+      dorm1: 'chambre', dormN: 'chambres', bano1: 'salle de bains', banoN: 'salles de bains',
+      m2_cub: 'm² couverts', m2_tot: 'm² au total', m2_lote: 'm² de terrain', cochera: 'Garage', si: 'Oui',
+      credito: 'Prêt immobilier', credito_si: 'éligible',
+      titulo_auto: { venta: '{tipo} à vendre – {lugar}', alquiler: '{tipo} à louer – {lugar}' },
+      desc_auto: 'La description complète en français de ce bien arrive bientôt. Écrivez-nous sur WhatsApp et nous vous enverrons tous les détails, les photos et les vidéos.',
+      descripcion: 'Description', fotos: 'Photos', video: 'Vidéo',
+      interesado: 'Ce bien vous intéresse ?', btn_wa: 'Écrivez-nous sur WhatsApp', btn_mail: 'Envoyez-nous un e-mail',
+      nota_contacto: "Vous pouvez nous écrire en français. Du lundi au vendredi de 9 h à 18 h et le samedi de 9 h à 13 h, heure de l'Argentine (GMT−3).",
+      mapa_exacta: "Voir l'emplacement sur Google Maps", mapa_zona: 'Voir le secteur sur Google Maps',
+      inicio: 'Accueil', propiedades: 'Biens', volver: 'Retour à tous les biens',
+      no_esta: "Ce bien n'est plus disponible.", ver_todas: 'Voir tous les biens',
+      wa_prop: "Bonjour ! Ce bien m'intéresse : {t} ({u})", asunto: 'Demande : {t}',
+      nota_cambio: "Conversions approximatives : 1 € = {eur} USD (Banque centrale européenne, {f1}) et 1 USD = {ars} ARS (taux officiel en Argentine, {f2}). Seul le prix dans la devise d'origine fait foi.",
+      foto: 'photo', anterior: 'Page précédente', siguiente: 'Page suivante'
     }
   })[L];
+
+  // Tipografía francesa: espacio fino que no corta antes de ? ! : ; y entre el número y la unidad.
+  function tipoFr(v) {
+    if (typeof v === 'string') {
+      return v.replace(/ ([?!:;»])/g, '\u202f$1').replace(/« /g, '«\u202f')
+        .replace(/(\d) (h\b|€|USD|ARS|m²)/g, '$1\u00a0$2');
+    }
+    if (Array.isArray(v)) return v.map(tipoFr);
+    if (v && typeof v === 'object') {
+      var o = {};
+      Object.keys(v).forEach(function (k) { o[k] = tipoFr(v[k]); });
+      return o;
+    }
+    return v;
+  }
+  if (L === 'fr') TX = tipoFr(TX);
 
   // ── Utilidades ──────────────────────────────────────────────
   function limpiar(s) {
@@ -117,21 +203,23 @@
     return plantilla.replace(/\{(\w+)\}/g, function (_, k) { return datos[k] == null ? '' : datos[k]; });
   }
   function num(n, dec) {
-    return Number(n).toLocaleString(L === 'de' ? 'de-DE' : 'en-GB', { maximumFractionDigits: dec == null ? 0 : dec });
+    return Number(n).toLocaleString(LOCALE, { maximumFractionDigits: dec == null ? 0 : dec });
   }
   function fecha(iso) {
     if (!iso) return '';
     var d = new Date(iso + 'T12:00:00');
     if (isNaN(d)) return iso;
-    return d.toLocaleDateString(L === 'de' ? 'de-DE' : 'en-GB', { day: 'numeric', month: L === 'de' ? 'long' : 'short', year: 'numeric' });
+    return d.toLocaleDateString(LOCALE, { day: 'numeric', month: L === 'en' ? 'short' : 'long', year: 'numeric' });
   }
   function moneda(p) {
     var m = String(p.Moneda || '').trim().toUpperCase();
     return m === 'EUR' ? 'EUR' : m === 'USD' ? 'USD' : 'ARS';
   }
   function fmtPrecio(n, m) {
-    if (L === 'de') return num(n) + (m === 'EUR' ? ' €' : ' ' + m);
-    return m === 'EUR' ? '€' + num(n) : m + ' ' + num(n);
+    var simbolo = m === 'EUR' ? '€' : m;
+    if (L === 'en') return m === 'EUR' ? '€' + num(n) : m + ' ' + num(n);   // €3,990,000 · USD 895,000
+    if (L === 'it') return simbolo + '\u00a0' + num(n);                       // € 3.990.000 · USD 895.000
+    return num(n) + '\u00a0' + simbolo;                                       // 3.990.000 € (de) · 3 990 000 € (fr)
   }
   function redondear(v) {
     // Como las fichas fijas: de a 1.000 en precios de venta; de a 10 en alquileres chicos.
@@ -188,7 +276,7 @@
     var precio = n ? fmtPrecio(n, m) + (op === 'alquiler' ? ' ' + TX.por_mes : '') : TX.consultar;
     var conv = '';
     if (n) {
-      var dest = m === 'USD' ? 'EUR' : (m === 'EUR' ? 'USD' : (L === 'de' ? 'EUR' : 'USD'));
+      var dest = m === 'USD' ? 'EUR' : (m === 'EUR' ? 'USD' : (L === 'en' ? 'USD' : 'EUR'));
       var v = dest === 'USD' ? usd : usd / T.cambio.eur_usd;
       conv = '≈ ' + fmtPrecio(redondear(v), dest) + (op === 'alquiler' ? ' ' + TX.por_mes : '');
     }
@@ -351,7 +439,7 @@
       nFiltros: document.getElementById('biFiltrosN')
     };
     var T = null, todas = [], pagina = Math.max(1, parseInt(param('page'), 10) || 1);
-    var precioActivo = { moneda: param('cur') || (L === 'de' ? 'EUR' : 'USD'), min: param('min'), max: param('max') };
+    var precioActivo = { moneda: param('cur') || (L === 'en' ? 'USD' : 'EUR'), min: param('min'), max: param('max') };
 
     el.op.value = ['1', '2'].indexOf(param('op')) !== -1 ? param('op') : '';
     el.dorm.value = ['1', '2', '3', '4'].indexOf(param('bed')) !== -1 ? param('bed') : '';
@@ -594,8 +682,9 @@
       '<a class="en-btn en-btn-wa" href="' + esc(wa(msj)) + '" target="_blank" rel="noopener">' + esc(TX.btn_wa) + '</a>' +
       '<a class="en-btn en-btn-linea" href="mailto:contacto@vitriolinmobiliaria.com?subject=' + encodeURIComponent(f(TX.asunto, { t: x.titulo })) + '">' + esc(TX.btn_mail) + '</a>' +
       '<p class="en-contacto-nota">' + esc(TX.nota_contacto) + '</p>' + mapa +
-      '<a class="en-es" href="' + URLS.es.ficha + '?id=' + p.id + '" hreflang="es" lang="es">' + esc(TX.ver_es) + '</a>' +
-      '<a class="en-es" href="' + URLS[OTRO].ficha + '?id=' + p.id + '" hreflang="' + OTRO + '" lang="' + OTRO + '">' + esc(TX.ver_otro) + '</a>' +
+      ['es'].concat(IDIOMAS).filter(function (o) { return o !== L; }).map(function (o) {
+        return '<a class="en-es" href="' + URLS[o].ficha + '?id=' + p.id + '" hreflang="' + o + '" lang="' + o + '">' + esc(VER_EN[o]) + '</a>';
+      }).join('') +
       '</div></aside></div>';
 
     // Botón flotante de WhatsApp con el mensaje de esta propiedad
@@ -617,8 +706,9 @@
     if (x.fotos[0]) meta('og:image', (x.fotos[0].charAt(0) === '/' ? DOM : '') + x.fotos[0], true);
     enlace('canonical', url);
     enlace('alternate', url, L);
-    enlace('alternate', DOM + URLS[OTRO].ficha + '?id=' + p.id, OTRO);
-    enlace('alternate', DOM + URLS.es.ficha + '?id=' + p.id, 'es');
+    ['es'].concat(IDIOMAS).filter(function (o) { return o !== L; }).forEach(function (o) {
+      enlace('alternate', DOM + URLS[o].ficha + '?id=' + p.id, o);
+    });
     enlace('alternate', DOM + URLS.en.ficha + '?id=' + p.id, 'x-default');
   }
 
