@@ -1,5 +1,5 @@
 /* ============================================================
-   VITRIOL INMOBILIARIA — Páginas en inglés (/en/)
+   VITRIOL INMOBILIARIA — Páginas en inglés (/en/), alemán (/de/), italiano (/it/) y francés (/fr/)
    Negro y dorado. Se carga después de index.css.
 ============================================================ */
 
@@ -20,10 +20,13 @@ body.en-page {
    1.780 px (lo oculta botones.css) y en alemán, con palabras más largas, por debajo de 1.850 px. */
 /* 21/11/2026 (tarde): con "Properties" / "Immobilien" en el menú, el rótulo se pisa más abajo de
    unos 1.850 px en inglés y 1.950 px en alemán (medido en las páginas nuevas). */
-@media (max-width: 1870px) {
+/* 24/11/2026: con cuatro idiomas en el menú (italiano y francés), el rótulo no entra por debajo de unos
+   2.530 px (2.630 en alemán). Medido en las páginas nuevas. Los cortes terminan en .98 porque con zoom
+   (150 %) el ancho de la pantalla puede tener decimales. */
+@media (max-width: 2539.98px) {
   .en-page .navbar::after { display: none; }
 }
-@media (max-width: 1970px) {
+@media (max-width: 2639.98px) {
   html[lang="de"] .en-page .navbar::after { display: none; }
 }
 /* 21/11/2026: el menú suma un segundo idioma (Español + Deutsch / Español + English). */
@@ -31,6 +34,22 @@ body.en-page {
   .en-page .navbar-links { gap: 1.1rem; }
   .en-page .navbar-links a { font-size: 14px; letter-spacing: 0.05em; }
   .en-page .idioma-switch { padding: 3px 8px !important; }
+}
+/* 24/11/2026: con cuatro idiomas, el nombre ("English") entra desde unos 1.440 px (1.500 en alemán).
+   Más abajo va la sigla con la bandera ("EN") y, por debajo de 1.120 px, solo la bandera (botones.css). */
+@media (min-width: 1120px) and (max-width: 1459.98px) {
+  .en-page .navbar-links .idioma-switch .idioma-nombre { display: none; }
+  .en-page .navbar-links .idioma-switch .idioma-codigo { display: inline; }
+}
+@media (min-width: 1460px) and (max-width: 1519.98px) {
+  html[lang="de"] .en-page .navbar-links .idioma-switch .idioma-nombre { display: none; }
+  html[lang="de"] .en-page .navbar-links .idioma-switch .idioma-codigo { display: inline; }
+}
+/* Entre 901 y 1.000 px el menú en alemán no entraba ni con las banderas solas. */
+@media (min-width: 901px) and (max-width: 1000.98px) {
+  .en-page .navbar { padding: 0 32px; }
+  .en-page .navbar-links { gap: 0.85rem; }
+  .en-page .navbar-links a { font-size: 13px; letter-spacing: 0.03em; }
 }
 @media (max-width: 900px) {
   .en-page .navbar-links { overflow-y: auto; }

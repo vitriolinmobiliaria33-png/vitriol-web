@@ -62,8 +62,15 @@ img.bandera {
   margin-bottom: 0;
 }
 
-/* Menú de la PC con dos idiomas: en pantallas medianas quedan solo las banderas (el nombre sigue en el title) */
-@media (min-width: 901px) and (max-width: 1100px) {
+/* 24/11/2026: cada selector del menú trae el nombre ("English") y la sigla ("EN"). Con cuatro idiomas
+   el menú no entra entero: en las pantallas grandes va el nombre, en las medianas la sigla y en las
+   chicas solo la bandera (el nombre sigue en el title). Medido el 24/11 en las páginas en español.
+   Los cortes terminan en .98 porque con zoom (150 %) el ancho de la pantalla puede tener decimales. */
+.idioma-switch .idioma-codigo {
+  display: none;
+}
+
+@media (min-width: 901px) and (max-width: 1119.98px) {
   .navbar-links .idioma-switch {
     font-size: 0 !important;
     gap: 0;
@@ -71,8 +78,30 @@ img.bandera {
   }
 }
 
-/* Con los idiomas en el menú, el rótulo del centro de la barra no entra por debajo de unos 1.780 px */
-@media (max-width: 1780px) {
+/* Entre 901 y 1.000 px el menú en español no entraba ni con las banderas solas */
+@media (min-width: 901px) and (max-width: 1000.98px) {
+  .navbar-links {
+    gap: 1.1rem;
+  }
+
+  .navbar-links a {
+    font-size: 14px;
+    letter-spacing: 0.04em;
+  }
+}
+
+@media (min-width: 1120px) and (max-width: 1379.98px) {
+  .navbar-links .idioma-switch .idioma-nombre {
+    display: none;
+  }
+
+  .navbar-links .idioma-switch .idioma-codigo {
+    display: inline;
+  }
+}
+
+/* Con los idiomas en el menú, el rótulo del centro de la barra no entra por debajo de unos 2.350 px */
+@media (max-width: 2379.98px) {
   .navbar:has(.idioma-switch)::after {
     display: none;
   }
